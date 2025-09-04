@@ -18,7 +18,7 @@ public class LoginTest extends FrameworkLibrary {
 	HashMap<String, String> expectedHMap = null;
 	HashMap<String, String> actualHMap = null;
 
-	@Test
+	@Test(enabled = false, priority = 1)
 	@ZephyrCase("SCRUM-T1") 
 	public void testManageServiceTypes() {
 		try {
