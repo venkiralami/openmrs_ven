@@ -109,6 +109,7 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 			boolean isDeleted = manageServiceTypesPage.deleteServiceTypeDetails(serviceNameEdit);
 			System.out.println("Deleted? " +isDeleted);
 			softAssert.assertTrue(isDeleted, "Deleted Service Type details are still present!");
+			Thread.sleep(5000);
 			boolean b2 = manageServiceTypesPage.searchRecordWithNextButton(serviceNameEdit);
 			softAssert.assertFalse(b2, "Deleted Service Type details are still avaiable!");
 			softAssert.assertAll();

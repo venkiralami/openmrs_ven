@@ -400,12 +400,24 @@ stage('Send Extent Report Summary Email') {
                 def emailBody = """
                     ${summaryTable}
                     <br>
+                    
+                     <table border="1" cellpadding="5" cellspacing="0">
+                        <tr><th>Jenkins Build URL:</th><th>Extent Report</th><th>Sonar Report</th></tr>
+                        <tr>
+                            <td style='color:blue'><b><a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></b></td>
+                            <td style='color:green'><b> 📊 <a href="${env.BUILD_URL}artifact/${extentReportPath}">View Full Extent Report</a></b></td>
+                            <td style='color:red'><b><p>🔗 <a href="${SONAR_URL}/dashboard?id=${SONAR_PROJECT_KEY}">View Full SonarQube Report</a></p></b></td>
+                            
+                        </tr>
+                    </table>
+                    
                     <h4>Jenkins Build URL:</h4>
                     <a href='${env.BUILD_URL}'>${env.BUILD_URL}</a>
                     <br>
                     <h4>Extent Report:</h4>
                     📊 <a href="${env.BUILD_URL}artifact/${extentReportPath}">View Full Extent Report</a>
                     <br>
+                    <h4>Sonar Report:</h4>
                     <p>🔗 <a href="${SONAR_URL}/dashboard?id=${SONAR_PROJECT_KEY}">View Full SonarQube Report</a></p>
                     <br>
                     ${extentReportHtml}

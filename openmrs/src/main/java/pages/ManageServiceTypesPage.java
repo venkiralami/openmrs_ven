@@ -3,8 +3,11 @@ package pages;
 import java.util.HashMap;
 import java.util.List;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.http.Contents.Supplier;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -37,7 +40,7 @@ public class ManageServiceTypesPage {
 	private By nextButton = By.xpath("//a[@id='appointmentTypesTable_next']");
 	private By firstButton = By.xpath("//a[@id='appointmentTypesTable_first']");
 	private By pageNumbers = By.xpath("//a[@class='fg-button ui-button ui-state-default']");
-	
+
 	public ManageServiceTypesPage(WebDriver driver){
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
@@ -45,6 +48,7 @@ public class ManageServiceTypesPage {
 			throw new IllegalStateException("This is not Manage Service Types Page," + " current page is: " + driver.getCurrentUrl());
 		}
 	}
+	
 	// ✅ Get all rows
 	public List<WebElement> getTableRows() {
 		return driver.findElements(tableRows);
@@ -60,23 +64,40 @@ public class ManageServiceTypesPage {
 	public void clickNext() {
 		driver.findElement(nextButton).click();
 	}
-	
-	// ✅ Check if First button enabled
-		public boolean isFirstButtonEnabled() {
-			boolean isEnabled = false;
-			System.out.println("isFirstButtonEnabled: before: " + isEnabled);
-			WebElement firstBtn =  driver.findElement(firstButton);
-			isEnabled = firstBtn.isDisplayed() && firstBtn.isEnabled() && !firstBtn.getAttribute("class").contains("disabled");
-			System.out.println("isFirstButtonEnabled: after:" + isEnabled);
-			return isEnabled;
-		}
 
-		// ✅ Click First
-		public void clickFirst() {
-			driver.findElement(firstButton).click();
-		}
-		
-		
+	// ✅ Check if First button enabled
+	public boolean isFirstButtonEnabled() {
+	    try {
+	        WebElement firstBtn = driver.findElement(firstButton);
+
+	        boolean isEnabled = firstBtn.isDisplayed()
+	                && firstBtn.isEnabled()
+	                && !firstBtn.getAttribute("class").contains("disabled");
+
+	        System.out.println("isFirstButtonEnabled: " + isEnabled);
+	        return isEnabled;
+	    } catch (NoSuchElementException e) {
+	        System.out.println("⚠️ First button not found on page");
+	        return false;
+	    }
+	}
+	
+	// ✅ Reset to first page if not already there
+	private void goToFirstPage() {
+	    if (isFirstButtonEnabled()) {
+	        WebElement firstBtn = driver.findElement(firstButton);
+	        firstBtn.click();
+	        waitFor(1000); // small wait to reload table
+	        System.out.println("🔄 Moved to first page");
+	    } else {
+	        System.out.println("ℹ️ Already at first page, no action needed");
+	    }
+	}
+
+	// ✅ Click First
+	public void clickFirst() {
+		driver.findElement(firstButton).click();
+	}
 
 	public void clickOnNewServiceType()
 	{
@@ -161,41 +182,34 @@ public class ManageServiceTypesPage {
 
 	// ✅ Search using Next button pagination always starts from Page 1 
 	public boolean searchRecordWithNextButton(String searchText) {
-	    if (searchText == null || searchText.isEmpty()) {
-	        throw new IllegalArgumentException("❌ Search text cannot be null or empty");
-	    }
+		if (searchText == null || searchText.isEmpty()) {
+			throw new IllegalArgumentException("❌ Search text cannot be null or empty");
+		}
 
-	    // ✅ Ensure we start at the first page
-	    goToFirstPage();
+		// ✅ Ensure we start at the first page
+		goToFirstPage();
 
-	    while (true) {
-	        for (WebElement row : getTableRows()) {
-	            String rowText = row.getText();
-	            if (rowText != null && rowText.contains(searchText)) {
-	                System.out.println("✅ Next Record found: " + rowText);
-	                return true;
-	            }
-	        }
+		while (true) {
+			for (WebElement row : getTableRows()) {
+				String rowText = row.getText();
+				if (rowText != null && rowText.contains(searchText)) {
+					System.out.println("✅ Next Record found: " + rowText);
+					return true;
+				}
+			}
 
-	        if (isNextButtonEnabled()) {
-	            clickNext();
-	        } else {
-	            break; // no more pages
-	        }
-	    }
+			if (isNextButtonEnabled()) {
+				clickNext();
+			} else {
+				break; // no more pages
+			}
+		}
 
-	    System.out.println("❌ Next Record not found: " + searchText);
-	    return false;
+		System.out.println("❌ Next Record not found: " + searchText);
+		return false;
 	}
 
-	private void goToFirstPage() {
-	    if (isFirstButtonEnabled()) {
-	        clickFirst();
-	        System.out.println("🔄 Reset to first page before search");
-	        waitFor(1000); // wait for page to load
-	    }
-	}
-	
+
 	// ✅ Search using Page Number pagination
 	public boolean searchRecordWithPageNumbers(String searchText) {
 		List<WebElement> pages = driver.findElements(pageNumbers);
