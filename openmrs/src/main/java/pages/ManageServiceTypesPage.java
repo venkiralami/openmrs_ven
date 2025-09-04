@@ -63,10 +63,11 @@ public class ManageServiceTypesPage {
 	
 	// ✅ Check if First button enabled
 		public boolean isFirstButtonEnabled() {
-			
+			boolean isEnabled = false;
+			System.out.println("isFirstButtonEnabled: before: " + isEnabled);
 			WebElement firstBtn =  driver.findElement(firstButton);
-			boolean isEnabled = firstBtn.isDisplayed() && firstBtn.isEnabled() && !firstBtn.getAttribute("class").contains("disabled");
-			System.out.println("isFirstButtonEnabled: " + isEnabled);
+			isEnabled = firstBtn.isDisplayed() && firstBtn.isEnabled() && !firstBtn.getAttribute("class").contains("disabled");
+			System.out.println("isFirstButtonEnabled: after:" + isEnabled);
 			return isEnabled;
 		}
 
@@ -137,11 +138,10 @@ public class ManageServiceTypesPage {
 
 	public boolean deleteServiceTypeDetails(String serviceName){
 		expectedHMap = new HashMap<String, String>();
-		System.out.println("Deleting the record: " + serviceName);
 		while (true) {
 			for (WebElement row : getTableRows()) {
 				if (serviceName!=null && row.getText().contains(serviceName)) {
-					System.out.println("Record found: deleteServiceTypeDetails : " + row.getText());
+					System.out.println("Record found: deleteServiceTypeDetails : and Deleting record " + row.getText());
 					driver.findElement(By.xpath("//i[@id='appointmentschedulingui-delete-"+ serviceName +"']")).click();
 
 					driver.findElement(By.xpath("//div[@class='simplemodal-wrap']//button[@class='confirm right'][normalize-space()='Yes']")).click();
