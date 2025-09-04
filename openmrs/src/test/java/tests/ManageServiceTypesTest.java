@@ -33,13 +33,13 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 	public void testManageServiceTypes() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
-			System.out.println("\\n================ Login Start================================================");
+			System.out.println("\n================ Login Start================================================");
 			launchApplication(prop.getProperty("mrs_url"));
 			LoginPage loginPage = new LoginPage(driver);
 			loginPage.loginValidUser(prop.getProperty("mrs_admin_username"), prop.getProperty("mrs_admin_password"), prop.getProperty("mrs_session_location"));
 			softAssert.assertTrue(driver.getTitle().contains("Home"));
 
-			System.out.println("\\n================ Home Start ================================================");
+			System.out.println("\n================ Home Start ================================================");
 			HomePage homePage = new HomePage(driver);
 			homePage.navigateToAModule("appointmentschedulingui-homeAppLink-appointmentschedulingui-homeAppLink-extension");
 			softAssert.assertTrue(driver.getTitle().contains("OpenMRS Electronic Medical Record") || driver.getTitle().contains("Appointment Scheduling"));
@@ -58,11 +58,11 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 	public void testCreateManageServiceTypes() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
-			System.out.println("\\n================ Manage Service Start ================================================");
+			System.out.println("\n================ Manage Service Start ================================================");
 			ManageServiceTypesPage manageServiceTypesPage = new ManageServiceTypesPage(driver);
 			manageServiceTypesPage.clickOnNewServiceType();
 
-			System.out.println("\\n================ New Service Type Start ================================================");
+			System.out.println("\n================ New Service Type Start ================================================");
 			
 			expectedHMap = manageServiceTypesPage.saveServiceTypeDetails(serviceNameNew, durationNew, descriptionNew);
 			System.out.println("Save Expected HMap::" +expectedHMap);
@@ -103,12 +103,12 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 		try {
 			SoftAssert softAssert = new SoftAssert();
 			ManageServiceTypesPage manageServiceTypesPage = new ManageServiceTypesPage(driver);
-			System.out.println("\n================ Delete Service Type Start ================================================");
+			System.out.println("\n================ Delete Service Type Start ================================================"+serviceNameEdit);
 			boolean isDeleted = manageServiceTypesPage.deleteServiceTypeDetails(serviceNameEdit);
 			System.out.println("Deleted? " +isDeleted);
 			softAssert.assertTrue(isDeleted, "Deleted Service Type details are still present!");
 			boolean b1 = manageServiceTypesPage.searchRecordWithNextButton(serviceNameEdit);
-			softAssert.assertTrue(b1, "Deleted Service Type details are still avaiable!");
+			softAssert.assertFalse(b1, "Deleted Service Type details are still avaiable!");
 			softAssert.assertAll();
 			System.out.println("\n================ Delete Service Type End ================================================\n");
 		} catch (Exception e) {
