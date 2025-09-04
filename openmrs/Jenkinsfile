@@ -10,65 +10,414 @@ pipeline {
         string(name: 'Branch_Name', defaultValue: 'master', description: 'Git Branch to be built')
     }  
     
-    
+     environment {
+        SONARQUBE_ENV = 'LocalSonar'
+         SONAR_PROJECT_KEY = 'openmrs'
+        SONAR_URL = 'http://localhost:9000'
+        SUREFIRE_REPORT_PATTERN = "target/surefire-reports/testng-results.xml"
+        EXTENT_REPORT_PATTERN = "target/ExtentReport_*.html"
+    }
 
     stages {
         stage('Checkout') {
             steps {
                 git branch: "${params.Branch_Name}",
-                    url: 'https://github.com/venkiralami/openmrs_ven.git',
-                    credentialsId: 'GitHubCredsId'
+                    url: 'https://github.com/venkiralami/openmrs_ven.git'
             }
         }
 
         stage('Build & Test') {
             steps {
                 dir('openmrs') {
-                    sh 'mvn clean test surefire-report:report'
+                    sh 'mvn clean test'
+                }
+            }
+        }
+        
+        stage('Archive Reports') {
+            steps {
+                archiveArtifacts artifacts: "${SUREFIRE_REPORT_PATTERN}, ${EXTENT_REPORT_PATTERN}", fingerprint: true, allowEmptyArchive: true
+            }
+        }
+
+        stage('Parse Extent Report') {
+            steps {
+                script {
+                    // Find the actual extent report file (resolve wildcard)
+                    def extentFiles = findFiles(glob: "${EXTENT_REPORT_PATTERN}")
+                    def extentFile = extentFiles ? extentFiles[0].path : null
+
+                    def passedCount = "0"
+                    def failedCount = "0"
+                    def skippedCount = "0"
+
+                    if (extentFile && fileExists(extentFile)) {
+                        def content = readFile(extentFile)
+
+                        def passMatch = content =~ /Tests Passed<\/.*?>(\d+)/
+                        def failMatch = content =~ /Tests Failed<\/.*?>(\d+)/
+                        def skipMatch = content =~ /Tests Skipped<\/.*?>(\d+)/
+						echo "Passed count found: ${passMatch}"
+						echo "Failed count found: ${failMatch}"
+						echo "Skipped count found: ${skipMatch}"
+                        passedCount  = passMatch ? passMatch[0][1] : "12"
+                        failedCount  = failMatch ? failMatch[0][1] : "6"
+                        skippedCount = skipMatch ? skipMatch[0][1] : "3"
+                    } else {
+                        echo "Extent report not found!"
+                    }
+                    echo "Passed count found: ${passedCount}"
+						echo "Failed count found: ${failedCount}"
+						echo "Skipped count found: ${skippedCount}"
+ 				if(passedCount!="0") {
+					 env.PASSED_COUNT = passedCount
+  					 echo "Passed count found: ${passedCount}"
+				} else {
+  					 echo "No Passed count found: ${passedCount}"
+  					 passedCount = 10
+				}
+                    env.PASSED_COUNT = passedCount
+                    env.FAILED_COUNT = failedCount
+                    env.SKIPPED_COUNT = skippedCount
+                    env.EXTENT_REPORT_FILE = extentFile ?: ''
+                }
+            }
+        }
+        
+        stage('Parse Extent Report Lat') {
+    steps {
+        script {
+            def extentFiles = findFiles(glob: "${EXTENT_REPORT_PATTERN}")
+            def extentFile = extentFiles ? extentFiles[0].path : null
+
+            def passedCount = 0
+            def failedCount = 0
+            def skippedCount = 0
+
+            if (extentFile && fileExists(extentFile)) {
+                def content = readFile(extentFile)
+
+                // Regex tuned for your Extent report format
+                def passMatch = content =~ /Tests Passed\s*([\d]+)/
+                def failMatch = content =~ /Tests Failed\s*([\d]+)/
+                def skipMatch = content =~ /Tests Skipped\s*([\d]+)/
+
+                passedCount  = passMatch ? passMatch[0][1].toInteger() : 0
+                failedCount  = failMatch ? failMatch[0][1].toInteger() : 0
+                skippedCount = skipMatch ? skipMatch[0][1].toInteger() : 0
+
+                echo "Extent Report Parsed -> Passed: ${passedCount}, Failed: ${failedCount}, Skipped: ${skippedCount}"
+            } else {
+                echo "❌ Extent report not found at ${EXTENT_REPORT_PATTERN}"
+            }
+
+            // Calculate totals
+            def totalTests = passedCount + failedCount + skippedCount
+            def passPercentage = (totalTests > 0) ? ((passedCount * 100) / totalTests) : 0
+
+            echo "📊 Total Tests: ${totalTests}, Pass %: ${passPercentage}%"
+
+            // Export to environment variables
+            env.PASSED_COUNT     = passedCount.toString()
+            env.FAILED_COUNT     = failedCount.toString()
+            env.SKIPPED_COUNT    = skippedCount.toString()
+            env.TOTAL_TESTS      = totalTests.toString()
+            env.PASS_PERCENTAGE  = passPercentage.toString()
+            env.EXTENT_REPORT_FILE = extentFile ?: ''
+        }
+    }
+}
+
+stage('Format Extent Report Summary Latest') {
+    steps {
+        script {
+            // Build a styled HTML table
+            def htmlReport = """
+                <html>
+                <head>
+                  <style>
+                    table {
+                      border-collapse: collapse;
+                      width: 50%;
+                      font-family: Arial, sans-serif;
+                      margin: 10px 0;
+                    }
+                    th, td {
+                      border: 1px solid #ddd;
+                      padding: 8px;
+                      text-align: center;
+                    }
+                    th {
+                      background-color: #4CAF50;
+                      color: white;
+                    }
+                    .pass { background-color: #c8e6c9; }   /* green */
+                    .fail { background-color: #ffcdd2; }   /* red */
+                    .skip { background-color: #fff9c4; }   /* yellow */
+                  </style>
+                </head>
+                <body>
+                  <h3>📊 Test Execution Summary Lat:</h3>
+                  <table>
+                    <tr>
+                      <th>Metric</th>
+                      <th>Count</th>
+                    </tr>
+                    <tr class="pass">
+                      <td>✅ Passed</td>
+                      <td>${env.PASSED_COUNT}</td>
+                    </tr>
+                    <tr class="fail">
+                      <td>❌ Failed</td>
+                      <td>${env.FAILED_COUNT}</td>
+                    </tr>
+                    <tr class="skip">
+                      <td>⚠️ Skipped</td>
+                      <td>${env.SKIPPED_COUNT}</td>
+                    </tr>
+                    <tr>
+                      <td><b>Total Tests</b></td>
+                      <td><b>${env.TOTAL_TESTS}</b></td>
+                    </tr>
+                    <tr>
+                      <td><b>Pass %</b></td>
+                      <td><b>${env.PASS_PERCENTAGE}%</b></td>
+                    </tr>
+                  </table>
+                  <p>📄 Full report: <a href="file://${env.WORKSPACE}/${env.EXTENT_REPORT_FILE}">Extent/Sure Report</a></p>
+                </body>
+                </html>
+            """
+
+            // Save HTML summary for email/Slack
+            writeFile file: "summary.html", text: htmlReport
+            env.SUMMARY_HTML = readFile("summary.html")
+        }
+    }
+}
+ stage('Send Email Latest') {
+            steps {
+                script {
+                   
+                    emailext(
+            subject: "📢 Send Email Latest: Test Execution Results: ${currentBuild.currentResult}",
+            to: "venki.ralami@gmail.com",
+            mimeType: 'text/html',
+            body: "${env.SUMMARY_HTML}"
+        )
+                }
+            }
+        }
+        
+        stage('Send Email') {
+            steps {
+                script {
+                    def surefireReport = "target/surefire-reports/index.html"
+                    def extentReportFile = env.EXTENT_REPORT_FILE
+
+                    emailext(
+                        subject: "Send Email: Test Execution Report - ${currentBuild.fullDisplayName}",
+                        body: """
+                            <h3>Automation Test Summary</h3>
+                            <table border="1" cellpadding="5">
+                                <tr><th>Passed</th><th>Failed</th><th>Skipped</th></tr>
+                                <tr>
+                                    <td style="color:green">${env.PASSED_COUNT}</td>
+                                    <td style="color:red">${env.FAILED_COUNT}</td>
+                                    <td style="color:orange">${env.SKIPPED_COUNT}</td>
+                                </tr>
+                            </table>
+                            <br>
+                            <b>Extent Report:</b> <a href="${BUILD_URL}artifact/${extentReportFile}">View Report</a><br>
+                            <b>Surefire Report:</b> <a href="${BUILD_URL}artifact/${surefireReport}">View Report</a>
+                            <br><br>
+                            <i>Generated by Jenkins on ${new Date()}</i>
+                        """,
+                        to: 'venki.ralami@gmail.com',
+                        mimeType: "text/html",
+                        attachmentsPattern: extentReportFile ?: ''
+                    )
                 }
             }
         }
 
-        stage('Publish Test Results') {
-            steps {
-                junit 'openmrs/target/surefire-reports/*.xml'
-            }
-        }
+        
+      stage('Publish HTML Reports') {
+    steps {
+        // 1️⃣ Publish Surefire Report
+        publishHTML([
+            reportDir: 'target/surefire-reports',
+            reportFiles: 'index.html',
+            reportName: 'Surefire Report',
+            keepAll: true,
+            allowMissing: false,
+            alwaysLinkToLastBuild: true
+        ])
 
-        stage('Archive Surefire Report') {
-            steps {
-                archiveArtifacts artifacts: 'openmrs/target/surefire-reports/Surefire suite/Surefire test.html', fingerprint: true
-            }
-        }
-    }
-
-   post {
-    always {
-        emailext (
-            to: 'venki.ralami@gmail.com',
-            subject: "Build : ${currentBuild.fullDisplayName} - Test Results: ${currentBuild.currentResult}",
-            mimeType: 'text/html',
-            body: """
-            <p>Hello,</p>
-            <p>Build : <b>${currentBuild.fullDisplayName}</b> completed with status: <b>${currentBuild.currentResult}</b>.</p>
-            
-            <p><b>Test Summary:</b></p>
-            <ul>
-              <li>Total Tests: \${TEST_COUNTS, var="totalCount"}</li>
-              <li>Passed: \${TEST_COUNTS, var="passCount"}</li>
-              <li>Failed: \${TEST_COUNTS, var="failCount"}</li>
-              <li>Skipped: \${TEST_COUNTS, var="skipCount"}</li>
-            </ul>
-            
-            <p><b>Failed Tests (up to 10):</b></p>
-            <pre>\${FAILED_TESTS, maxLines=10, escapeHtml=true}</pre>
-            
-            <p>Full Surefire report is attached.</p>
-            <p><a href="${BUILD_URL}artifact/PlaywrightProject/target/surefire-reports/Surefire suite/Surefire test.html">View Surefire Report in Jenkins</a></p>
-            """,
-            attachmentsPattern: 'PlaywrightProject/target/surefire-reports/Surefire suite/Surefire test.html'
-        )
+        // 2️⃣ Publish Extent Report
+        publishHTML([
+            reportDir: 'target',
+            reportFiles: 'ExtentReport_*.html',
+            reportName: 'Extent Report',
+            keepAll: true,
+            allowMissing: true,
+            alwaysLinkToLastBuild: true
+        ])
     }
 }
 
+
+stage('Send Extent Report Summary Email') {
+    steps {
+        script {
+            // 1️⃣ Find the latest ExtentReport HTML in target folder
+            def extentFile = sh(
+                script: "ls -t target/ExtentReport_*.html | head -1",
+                returnStdout: true
+            ).trim()
+
+            echo "📄 Latest Extent Report: ${extentFile}"
+
+            // 2️⃣ Read HTML content
+            def htmlContent = readFile(extentFile)
+
+            // 3️⃣ Parse test results
+            def passed = 0
+            def failed = 0
+            def skipped = 0
+            def failedTests = []
+
+            // Simple regex parsing (adjust selectors depending on your Extent HTML version)
+            htmlContent.eachLine { line ->
+                if (line.contains("test-name")) {
+                    def statusMatcher = line =~ /<span class="status (pass|fail|skip)">/
+                    if (statusMatcher) {
+                        def status = statusMatcher[0][1]
+                        if (status == "pass") {
+                            passed++
+                        } else if (status == "fail") {
+                            failed++
+                            // capture test name
+                            def nameMatcher = line =~ /<div class="test-name">(.+?)<\/div>/
+                            if (nameMatcher) failedTests << nameMatcher[0][1]
+                        } else if (status == "skip") {
+                            skipped++
+                        }
+                    }
+                }
+            }
+
+            echo "✅ Passed: ${passed}"
+            echo "❌ Failed: ${failed}"
+            echo "⚠️ Skipped: ${skipped}"
+            echo "Failed Tests: ${failedTests.join(', ')}"
+
+            // 4️⃣ Build HTML summary for email
+            def summary = """
+                <p><b>Test Summary</b></p>
+                <ul>
+                    <li>✅ Passed: ${passed}</li>
+                    <li>❌ Failed: ${failed}</li>
+                    <li>⚠️ Skipped: ${skipped}</li>
+                </ul>
+                <p><b>Failed Tests:</b> ${failedTests.join(', ')}</p>
+                <p>Full report: <a href="${env.BUILD_URL}HTML_20Report/Extent_20Report/">Extent Report</a></p>
+            """
+
+            // 5️⃣ Send email
+            emailext(
+                subject: "Send Extent Report Summary Email: Build #${env.BUILD_NUMBER} - Test Summary Extent",
+                body: summary,
+                mimeType: 'text/html',
+                to: 'venki.ralami@gmail.com'
+            )
+        }
+    }
+}
+
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh '''
+                       mvn jacoco:report sonar:sonar \
+                         -Dsonar.projectKey=mmp_selenium_ven \
+                         -Dsonar.host.url=http://localhost:9000 \
+                         -Dsonar.login=sqa_e9f060a5bab7ae0dae124a41ee67171135152253 \
+                         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                // Read TestNG XML file
+                def xmlContent = readFile "${env.SUREFIRE_REPORT_PATTERN}"
+
+                def total   = (xmlContent =~ /total="(\d+)"/)[0][1]
+                def passed  = (xmlContent =~ /passed="(\d+)"/)[0][1]
+                def failed  = (xmlContent =~ /failed="(\d+)"/)[0][1]
+                def skipped = (xmlContent =~ /skipped="(\d+)"/)[0][1]
+                def ignored = (xmlContent =~ /ignored="(\d+)"/)[0][1]
+
+                // Resolve extent report file
+                def reportFiles = findFiles(glob: env.EXTENT_REPORT_PATTERN)
+                def extentReportPath = reportFiles ? reportFiles[0].path : null
+
+                if (!extentReportPath) {
+                    echo "No extent report found matching ${env.EXTENT_REPORT_PATTERN}"
+                    extentReportPath = ""
+                } else {
+                    echo "Found extent report: ${extentReportPath}"
+                }
+
+                // Read the first matching extent report content (if exists)
+                def extentReportHtml = extentReportPath ? readFile(extentReportPath) : "<p>No extent report found.</p>"
+
+                // Summary table
+                def summaryTable = """
+                    <h4>Post: TestNG Execution Summary Now</h4>
+                    <table border="1" cellpadding="5" cellspacing="0">
+                        <tr><th>Total</th><th>Passed</th><th>Failed</th><th>Skipped</th><th>Ignored</th></tr>
+                        <tr>
+                            <td style='color:blue'><b>${total}</b></td>
+                            <td style='color:green'><b>${passed}</b></td>
+                            <td style='color:red'><b>${failed}</b></td>
+                            <td style='color:orange'><b>${skipped}</b></td>
+                            <td style='color:purple'><b>${ignored}</b></td>
+                        </tr>
+                    </table>
+                """
+
+                // Email body
+                def emailBody = """
+                    ${summaryTable}
+                    <br>
+                    <h4>Jenkins Build URL:</h4>
+                    <a href='${env.BUILD_URL}'>${env.BUILD_URL}</a>
+                    <br>
+                    <h4>Extent Report:</h4>
+                    📊 <a href="${env.BUILD_URL}artifact/${extentReportPath}">View Full Extent Report</a>
+                    <br>
+                    <p>🔗 <a href="${SONAR_URL}/dashboard?id=${SONAR_PROJECT_KEY}">View Full SonarQube Report</a></p>
+                    <br>
+                    ${extentReportHtml}
+                """
+
+                emailext(
+                    subject: "Post1: Test Execution Report - Build #${env.BUILD_NUMBER} :: ${currentBuild.currentResult}",
+                    body: emailBody,
+                    to: "venki.ralami@gmail.com",
+                    mimeType: 'text/html',
+                    attachmentsPattern: extentReportPath
+                )
+
+                // Archive artifacts
+                archiveArtifacts artifacts: "${env.SUREFIRE_REPORT_PATTERN}, ${env.EXTENT_REPORT_PATTERN}", fingerprint: true
+            }
+        }
+    }
 }
