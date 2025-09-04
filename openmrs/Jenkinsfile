@@ -195,6 +195,21 @@ stage('Format Extent Report Summary Latest') {
         }
     }
 }
+
+ stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+                    sh '''
+                    mvn clean verify sonar:sonar \
+ 						-Dsonar.projectKey=openmrs \
+ 						-Dsonar.host.url=http://localhost:9000 \
+ 						-Dsonar.login=sqa_e9f060a5bab7ae0dae124a41ee67171135152253 \
+						-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        		'''
+                }
+            }
+        }
+        
  stage('Send Email Latest') {
             steps {
                 script {
@@ -336,19 +351,6 @@ stage('Send Extent Report Summary Email') {
 }
 
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv("${SONARQUBE_ENV}") {
-                    sh '''
-                       mvn jacoco:report sonar:sonar \
-                         -Dsonar.projectKey=openmrs \
-                         -Dsonar.host.url=http://localhost:9000 \
-                         -Dsonar.login=sqa_e9f060a5bab7ae0dae124a41ee67171135152253 \
-                         -Dsonar.coverage.jacoco.xmlReportPaths=openmrs/target/site/jacoco/jacoco.xml
-                    '''
-                }
-            }
-        }
     }
 
     post {
