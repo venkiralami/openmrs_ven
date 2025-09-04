@@ -14,8 +14,8 @@ pipeline {
         SONARQUBE_ENV = 'LocalSonar'
          SONAR_PROJECT_KEY = 'openmrs'
         SONAR_URL = 'http://localhost:9000'
-        SUREFIRE_REPORT_PATTERN = "target/surefire-reports/testng-results.xml"
-        EXTENT_REPORT_PATTERN = "target/ExtentReport_*.html"
+        SUREFIRE_REPORT_PATTERN = "openmrs/target/surefire-reports/testng-results.xml"
+        EXTENT_REPORT_PATTERN = "openmrs/target/ExtentReport_*.html"
     }
 
     stages {
