@@ -25,11 +25,19 @@ pipeline {
                     url: 'https://github.com/venkiralami/openmrs_ven.git'
             }
         }
-
-        stage('Build & Test') {
+        
+        stage('Build & Test & SonarQube Analysis') {
             steps {
-                dir('openmrs') {
-                    sh 'mvn clean test'
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
+					dir('openmrs') {
+                   	 sh '''
+                   	 mvn clean verify sonar:sonar \
+ 						-Dsonar.projectKey=openmrs \
+ 						-Dsonar.host.url=http://localhost:9000 \
+ 						-Dsonar.login=sqa_e9f060a5bab7ae0dae124a41ee67171135152253 \
+						-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+        			'''
+               		 }
                 }
             }
         }
@@ -196,21 +204,6 @@ stage('Format Extent Report Summary Latest') {
     }
 }
 
- stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv("${SONARQUBE_ENV}") {
-					dir('openmrs') {
-                   	 sh '''
-                   	 mvn clean verify sonar:sonar \
- 						-Dsonar.projectKey=openmrs \
- 						-Dsonar.host.url=http://localhost:9000 \
- 						-Dsonar.login=sqa_e9f060a5bab7ae0dae124a41ee67171135152253 \
-						-Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-        			'''
-               		 }
-                }
-            }
-        }
         
  stage('Send Email Latest') {
             steps {
@@ -402,7 +395,7 @@ stage('Send Extent Report Summary Email') {
                     <br>
                     
                      <table border="1" cellpadding="5" cellspacing="0">
-                        <tr><th>Jenkins Build URL:</th><th>Extent Report</th><th>Sonar Report</th></tr>
+                        <tr><thstyle='color:blue'>Jenkins Build URL:</th><thstyle='color:green'>Extent Report</th><thstyle='color:red'>Sonar Report</th></tr>
                         <tr>
                             <td style='color:blue'><b><a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></b></td>
                             <td style='color:green'><b> 📊 <a href="${env.BUILD_URL}artifact/${extentReportPath}">View Full Extent Report</a></b></td>
