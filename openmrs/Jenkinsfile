@@ -212,7 +212,7 @@ stage('Format Extent Report Summary Latest') {
         stage('Send Email') {
             steps {
                 script {
-                    def surefireReport = "target/surefire-reports/index.html"
+                    def surefireReport = "openmrs/target/surefire-reports/index.html"
                     def extentReportFile = env.EXTENT_REPORT_FILE
 
                     emailext(
@@ -246,7 +246,7 @@ stage('Format Extent Report Summary Latest') {
     steps {
         // 1️⃣ Publish Surefire Report
         publishHTML([
-            reportDir: 'target/surefire-reports',
+            reportDir: 'openmrs/target/surefire-reports',
             reportFiles: 'index.html',
             reportName: 'Surefire Report',
             keepAll: true,
@@ -256,7 +256,7 @@ stage('Format Extent Report Summary Latest') {
 
         // 2️⃣ Publish Extent Report
         publishHTML([
-            reportDir: 'target',
+            reportDir: 'openmrs/target',
             reportFiles: 'ExtentReport_*.html',
             reportName: 'Extent Report',
             keepAll: true,
@@ -272,7 +272,7 @@ stage('Send Extent Report Summary Email') {
         script {
             // 1️⃣ Find the latest ExtentReport HTML in target folder
             def extentFile = sh(
-                script: "ls -t target/ExtentReport_*.html | head -1",
+                script: "ls -t openmrs/target/ExtentReport_*.html | head -1",
                 returnStdout: true
             ).trim()
 
@@ -341,10 +341,10 @@ stage('Send Extent Report Summary Email') {
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
                     sh '''
                        mvn jacoco:report sonar:sonar \
-                         -Dsonar.projectKey=mmp_selenium_ven \
+                         -Dsonar.projectKey=openmrs \
                          -Dsonar.host.url=http://localhost:9000 \
                          -Dsonar.login=sqa_e9f060a5bab7ae0dae124a41ee67171135152253 \
-                         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                         -Dsonar.coverage.jacoco.xmlReportPaths=openmrs/target/site/jacoco/jacoco.xml
                     '''
                 }
             }
