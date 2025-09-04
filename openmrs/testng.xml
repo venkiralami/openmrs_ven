@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Zephyr Integration Suite" parallel="false">
+
+    <listeners>
+        <!-- Listener for updating Zephyr results (Squad or Scale) -->
+        <listener class-name="listeners.ListenerUtility"/> 
+    </listeners>
+
+    <test name="Selenium Tests with Zephyr">
+        <packages>
+            <package name="tests"/>
+        </packages>
+    </test>
+
+</suite>
