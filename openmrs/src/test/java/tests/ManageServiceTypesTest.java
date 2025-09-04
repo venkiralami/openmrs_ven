@@ -30,7 +30,7 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 	
 	@Test(priority = 1)
 	@ZephyrCase("SCRUM-T4") 
-	public void testManageServiceTypes() {
+	public void testOpenMrsLogin() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
 			System.out.println("\n================ Login Start================================================");
@@ -104,11 +104,13 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 			SoftAssert softAssert = new SoftAssert();
 			ManageServiceTypesPage manageServiceTypesPage = new ManageServiceTypesPage(driver);
 			System.out.println("\n================ Delete Service Type Start ================================================"+serviceNameEdit);
+			boolean b1 = manageServiceTypesPage.searchRecordWithNextButton(serviceNameEdit);
+			softAssert.assertTrue(b1, "Deleted Service Type details are still avaiable!");
 			boolean isDeleted = manageServiceTypesPage.deleteServiceTypeDetails(serviceNameEdit);
 			System.out.println("Deleted? " +isDeleted);
 			softAssert.assertTrue(isDeleted, "Deleted Service Type details are still present!");
-			boolean b1 = manageServiceTypesPage.searchRecordWithNextButton(serviceNameEdit);
-			softAssert.assertFalse(b1, "Deleted Service Type details are still avaiable!");
+			boolean b2 = manageServiceTypesPage.searchRecordWithNextButton(serviceNameEdit);
+			softAssert.assertFalse(b2, "Deleted Service Type details are still avaiable!");
 			softAssert.assertAll();
 			System.out.println("\n================ Delete Service Type End ================================================\n");
 		} catch (Exception e) {

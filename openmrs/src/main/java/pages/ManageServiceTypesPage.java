@@ -7,6 +7,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class ManageServiceTypesPage {
 
@@ -34,8 +35,9 @@ public class ManageServiceTypesPage {
 	// Locators
 	private By tableRows = By.cssSelector("table#appointmentTypesTable tbody tr");
 	private By nextButton = By.xpath("//a[@id='appointmentTypesTable_next']");
+	private By firstButton = By.xpath("//a[@id='appointmentTypesTable_first']");
 	private By pageNumbers = By.xpath("//a[@class='fg-button ui-button ui-state-default']");
-
+	
 	public ManageServiceTypesPage(WebDriver driver){
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
@@ -58,6 +60,22 @@ public class ManageServiceTypesPage {
 	public void clickNext() {
 		driver.findElement(nextButton).click();
 	}
+	
+	// ✅ Check if First button enabled
+		public boolean isFirstButtonEnabled() {
+			
+			WebElement firstBtn =  driver.findElement(firstButton);
+			boolean isEnabled = firstBtn.isDisplayed() && firstBtn.isEnabled() && !firstBtn.getAttribute("class").contains("disabled");
+			System.out.println("isFirstButtonEnabled: " + isEnabled);
+			return isEnabled;
+		}
+
+		// ✅ Click First
+		public void clickFirst() {
+			driver.findElement(firstButton).click();
+		}
+		
+		
 
 	public void clickOnNewServiceType()
 	{
@@ -141,28 +159,43 @@ public class ManageServiceTypesPage {
 		return false;
 	}
 
-	// ✅ Search using Next button pagination
+	// ✅ Search using Next button pagination always starts from Page 1 
 	public boolean searchRecordWithNextButton(String searchText) {
-		waitFor(5000);
-		while (true) {
-			for (WebElement row : getTableRows()) {
-				if (searchText!=null && row.getText().toString().contains(searchText)) {
-					System.out.println("Next : Record found: " + row.getText());
-					return true;
-				}
-			}
+	    if (searchText == null || searchText.isEmpty()) {
+	        throw new IllegalArgumentException("❌ Search text cannot be null or empty");
+	    }
 
-			if (isNextButtonEnabled()) {
-				clickNext();
-				waitFor(1000);
-			} else {
-				break;
-			}
-		}
-		System.out.println("Page : Record not found in this row: " + searchText);
-		return false;
+	    // ✅ Ensure we start at the first page
+	    goToFirstPage();
+
+	    while (true) {
+	        for (WebElement row : getTableRows()) {
+	            String rowText = row.getText();
+	            if (rowText != null && rowText.contains(searchText)) {
+	                System.out.println("✅ Next Record found: " + rowText);
+	                return true;
+	            }
+	        }
+
+	        if (isNextButtonEnabled()) {
+	            clickNext();
+	        } else {
+	            break; // no more pages
+	        }
+	    }
+
+	    System.out.println("❌ Next Record not found: " + searchText);
+	    return false;
 	}
 
+	private void goToFirstPage() {
+	    if (isFirstButtonEnabled()) {
+	        clickFirst();
+	        System.out.println("🔄 Reset to first page before search");
+	        waitFor(1000); // wait for page to load
+	    }
+	}
+	
 	// ✅ Search using Page Number pagination
 	public boolean searchRecordWithPageNumbers(String searchText) {
 		List<WebElement> pages = driver.findElements(pageNumbers);

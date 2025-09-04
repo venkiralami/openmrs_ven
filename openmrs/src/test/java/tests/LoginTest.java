@@ -23,7 +23,7 @@ public class LoginTest extends FrameworkLibrary {
 	public void testManageServiceTypes() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
-			System.out.println("================ Login Start================================================\n");
+			System.out.println("================ LoginTest Start========testManageServiceTypes========================================\n");
 			launchApplication(prop.getProperty("mrs_url"));
 			LoginPage loginPage = new LoginPage(driver);
 			loginPage.loginValidUser(prop.getProperty("mrs_admin_username"), prop.getProperty("mrs_admin_password"), prop.getProperty("mrs_session_location"));
