@@ -395,11 +395,18 @@ stage('Send Extent Report Summary Email') {
                     <br>
                     
                      <table border="1" cellpadding="5" cellspacing="0">
-                        <tr><thstyle='color:blue'>Jenkins Build URL:</th><thstyle='color:green'>Extent Report</th><thstyle='color:red'>Sonar Report</th></tr>
+                        <tr><th style='color:blue'>Jenkins Build URL:</th><th style='color:green'>Extent Report</th><th style='color:red'>Sonar Report</th></tr>
                         <tr>
+                            <td style='color:blue'><b>Jenkins Build URL</b></td>
                             <td style='color:blue'><b><a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></b></td>
-                            <td style='color:green'><b> 📊 <a href="${env.BUILD_URL}artifact/${extentReportPath}">View Full Extent Report</a></b></td>
-                            <td style='color:red'><b><p>🔗 <a href="${SONAR_URL}/dashboard?id=${SONAR_PROJECT_KEY}">View Full SonarQube Report</a></p></b></td>
+                         </tr>
+                        <tr>
+                            <td style='color:green'><b>Extent Report</b></td>
+                            <td style='color:green'><b><a href="${env.BUILD_URL}artifact/${extentReportPath}">View Full Extent Report</a></b></td>
+                        </tr>
+                         <tr>
+                            <td style='color:red'><b>Sonar Report</b></td>
+                            <td style='color:red'><b><p><a href="${SONAR_URL}/dashboard?id=${SONAR_PROJECT_KEY}">View Full SonarQube Report</a></p></b></td>
                             
                         </tr>
                     </table>
