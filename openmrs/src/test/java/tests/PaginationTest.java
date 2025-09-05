@@ -28,5 +28,12 @@ public class PaginationTest extends FrameworkLibrary {
         boolean recordFound = tablePage.searchRecordWithPageNumbers("Thor Walton");
         Assert.assertTrue(recordFound, "Record not found using Page number pagination!");
     }
+    
+    @Test	
+    @ZephyrCase("SCRUM-T1") // 
+    public void verifyFailTest() {
+    	
+        Assert.assertTrue(false, "Record not found using Page number pagination!");
+    }
 }
 

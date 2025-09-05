@@ -95,7 +95,7 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 			e.printStackTrace();
 			Assert.fail("Test failed due to exception: " + e.getMessage());
 		}
-	}
+	}  
 	
 	@Test(priority = 4)
 	@ZephyrCase("SCRUM-T7") 
