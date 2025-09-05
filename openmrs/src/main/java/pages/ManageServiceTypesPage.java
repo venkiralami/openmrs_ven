@@ -73,9 +73,8 @@ public class ManageServiceTypesPage {
 	        boolean isEnabled = firstBtn.isDisplayed()
 	                && firstBtn.isEnabled()
 	                && !firstBtn.getAttribute("class").contains("disabled");
-
-	        System.out.println("isFirstButtonEnabled: " + isEnabled);
 	        return isEnabled;
+	        
 	    } catch (NoSuchElementException e) {
 	        System.out.println("⚠️ First button not found on page");
 	        return false;
@@ -88,7 +87,6 @@ public class ManageServiceTypesPage {
 	        WebElement firstBtn = driver.findElement(firstButton);
 	        firstBtn.click();
 	        waitFor(1000); // small wait to reload table
-	        System.out.println("🔄 Moved to first page");
 	    } else {
 	        System.out.println("ℹ️ Already at first page, no action needed");
 	    }
@@ -162,7 +160,7 @@ public class ManageServiceTypesPage {
 		while (true) {
 			for (WebElement row : getTableRows()) {
 				if (serviceName!=null && row.getText().contains(serviceName)) {
-					System.out.println("Record found: deleteServiceTypeDetails : and Deleting record " + row.getText());
+					System.out.println("Record found and Deleting record " + row.getText());
 					driver.findElement(By.xpath("//i[@id='appointmentschedulingui-delete-"+ serviceName +"']")).click();
 
 					driver.findElement(By.xpath("//div[@class='simplemodal-wrap']//button[@class='confirm right'][normalize-space()='Yes']")).click();
@@ -209,7 +207,6 @@ public class ManageServiceTypesPage {
 		return false;
 	}
 
-
 	// ✅ Search using Page Number pagination
 	public boolean searchRecordWithPageNumbers(String searchText) {
 		List<WebElement> pages = driver.findElements(pageNumbers);
@@ -240,7 +237,4 @@ public class ManageServiceTypesPage {
 			e.printStackTrace();
 		}
 	}
-
-
-
 }

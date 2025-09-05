@@ -376,7 +376,7 @@ stage('Send Extent Report Summary Email') {
 
                 // Summary table
                 def summaryTable = """
-                    <h4>Post: TestNG Execution Summary Now</h4>
+                    <h4>Post: TestNG Execution Summary :</h4>
                     <table border="1" cellpadding="5" cellspacing="0">
                         <tr><th>Total</th><th>Passed</th><th>Failed</th><th>Skipped</th><th>Ignored</th></tr>
                         <tr>
@@ -393,9 +393,9 @@ stage('Send Extent Report Summary Email') {
                 def emailBody = """
                     ${summaryTable}
                     <br>
-                    
+                    <h4>Post: Execution Reports :</h4>
                      <table border="1" cellpadding="5" cellspacing="0">
-                        <tr><th style='color:blue'>Jenkins Build URL:</th><th style='color:green'>Extent Report</th><th style='color:red'>Sonar Report</th></tr>
+                        
                         <tr>
                             <td style='color:blue'><b>Jenkins Build URL</b></td>
                             <td style='color:blue'><b><a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></b></td>
