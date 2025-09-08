@@ -12,6 +12,7 @@ public class ConfigReader {
 		try {
 			FileInputStream fis = new FileInputStream("config/jira_zephyr_config.properties");
 			properties.load(fis);
+			System.out.println("✅ Loaded jira_zephyr_config.properties file successfully");
 		} catch (IOException e) {
 			throw new RuntimeException("❌ Failed to load jira_zephyr_config.properties file", e);
 		}

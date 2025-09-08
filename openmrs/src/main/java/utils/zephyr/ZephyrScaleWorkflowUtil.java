@@ -27,18 +27,18 @@ public class ZephyrScaleWorkflowUtil {
         }
     }
     
-    private void updateZephyr(ITestResult result, String status) {
+    private void updateZephyr(ITestResult result, String status, String comments) {
         try {
         	String testCycleKey = ConfigReader.getProperty("zephyr.scale.testCycleKey");
             Method method = result.getMethod().getConstructorOrMethod().getMethod();
-            ZephyrCase annotation = method.getAnnotation(ZephyrCase.class);
+            JiraTestKey annotation = method.getAnnotation(JiraTestKey.class);
             if (annotation != null) {
                 String testCaseKey = annotation.value(); // MUST be an existing test case key
                 ZephyrUpdater client = ZephyrClientFactory.getClient();
 
                 // Only update existing test case
                // if (client.testCaseExists(testCaseKey)) {
-                    client.updateExecutionForTestcase(testCycleKey, testCaseKey, status);
+                    client.updateExecutionForTestcase(testCycleKey, testCaseKey, status, comments);
                     System.out.println("[Zephyr] Updated " + testCaseKey + " -> " + status);
                // } else {
                 //    System.out.println("[Zephyr] Skipping update: Test case " + testCaseKey + " does not exist.");
@@ -106,7 +106,7 @@ public class ZephyrScaleWorkflowUtil {
 		zephyrUpdater.updateExecutions(cycleKey, testCases);
 		System.out.println("✅ Updated Test Executions");
 		
-		zephyrUpdater.updateExecutionForTestcase(cycleKey, testCases.get(1), "Pass");
+		zephyrUpdater.updateExecutionForTestcase(cycleKey, testCases.get(1), "Pass", "Updated Test Executions from ZephyrScaleWorkflowUtil");
 		
 		
 		} catch (IOException e) {

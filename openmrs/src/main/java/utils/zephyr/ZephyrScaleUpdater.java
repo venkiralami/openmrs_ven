@@ -114,8 +114,8 @@ public class ZephyrScaleUpdater implements ZephyrUpdater {
         }
     }
 
- // 5 Update execution for a single test case
-    public void updateExecutionForTestcase(String cycleKey, String testCase, String status) throws IOException {
+    // 5 Update execution for a single test case
+    public void updateExecutionForTestcase(String cycleKey, String testCase, String status, String comment) throws IOException {
 
             URL url = new URL(BASE_URL + "/testexecutions");
             HttpURLConnection conn = buildConnection(url, "POST");
@@ -124,6 +124,7 @@ public class ZephyrScaleUpdater implements ZephyrUpdater {
                     + "\"projectKey\":\"" + PROJECT_KEY + "\","
                     + "\"testCaseKey\":\"" + testCase + "\","
                     + "\"testCycleKey\":\"" + cycleKey + "\","
+                     + "\"comment\":\"" + comment + "\","
                     + "\"statusName\":\"" + status + "\""
                     + "}";
 
@@ -131,7 +132,7 @@ public class ZephyrScaleUpdater implements ZephyrUpdater {
 
             int responseCode = conn.getResponseCode();
             String response = readResponse(conn);
-            System.out.println("Update Execution: " + testCase + " -> " + status
+            System.out.println("[Zephyr] Update Execution: " + testCase + " -> " + status
                     + " (" + responseCode + "): " + response);
         
     }

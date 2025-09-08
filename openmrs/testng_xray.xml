@@ -1,0 +1,13 @@
+<suite name="XRay Integration Suite" parallel="true" thread-count="2">
+
+	<test name="XRay Tests">
+        <classes>
+            <class name="tests.SampleXRayTest"/>
+             <class name="tests.UpdateTestResultToXRay"/>
+                <listeners>
+                    <listener class-name="listeners.XRayTestListener"/>
+                </listeners>
+        </classes>
+    </test>
+
+</suite>

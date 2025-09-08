@@ -42,7 +42,7 @@ public class ZephyrSquadUpdater implements ZephyrUpdater {
 	}
 
 	@Override
-	public void updateExecutionForTestcase(String cycleKey, String testCase, String status) throws IOException {
+	public void updateExecutionForTestcase(String cycleKey, String testCase, String status, String comments) throws IOException {
 		// TODO Auto-generated method stub
 		
 	}

@@ -2,21 +2,20 @@ package pages;
 
 import java.util.HashMap;
 import java.util.List;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.remote.http.Contents.Supplier;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class ManageServiceTypesPage {
 
 	protected WebDriver driver;
 	HashMap<String, String> expectedHMap = null;
 
+	//button[normalize-space()='New service type']
 	@FindBy(xpath = "//button[@class='confirm appointment-type-label right']")
 	private WebElement btnNewServiceType;
 
@@ -35,6 +34,9 @@ public class ManageServiceTypesPage {
 	@FindBy(xpath = "//input[@class='cancel']")
 	private WebElement btnCancel;
 
+	@FindBy(css ="table#appointmentTypesTable tbody tr")
+	private List<WebElement> tableRowsList;
+	
 	// Locators
 	private By tableRows = By.cssSelector("table#appointmentTypesTable tbody tr");
 	private By nextButton = By.xpath("//a[@id='appointmentTypesTable_next']");
@@ -124,6 +126,9 @@ public class ManageServiceTypesPage {
 		expectedHMap = new HashMap<String, String>();
 		System.out.println("Editing the record: " + existingService);
 		while (true) {
+			
+			System.out.println("Tabel rows: getTableRows: " + getTableRows().size());
+			System.out.println("Tabel rows: tableRowsList: " + tableRowsList.size());
 			for (WebElement row : getTableRows()) {
 				if (existingService!=null && row.getText().contains(existingService)) {
 					System.out.println("Record found: editServiceTypeDetails : " + row.getText());

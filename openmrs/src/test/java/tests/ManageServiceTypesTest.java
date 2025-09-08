@@ -11,7 +11,7 @@ import pages.HomePage;
 import pages.LoginPage;
 import pages.ManageServiceTypesPage;
 import utils.CustomRandomUtils;
-import utils.zephyr.ZephyrCase;
+import utils.zephyr.JiraTestKey;
 
 public class ManageServiceTypesTest extends FrameworkLibrary {
 
@@ -29,7 +29,7 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 	String descriptionEdit = "Gynecology Consultation Description Ven-"+ranCharEdit;
 	
 	@Test(priority = 1)
-	@ZephyrCase("SCRUM-T4") 
+	@JiraTestKey("SCRUM-T4") 
 	public void testOpenMrsLogin() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
@@ -54,7 +54,7 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 	}
 
 	@Test(priority = 2)
-	@ZephyrCase("SCRUM-T5") 
+	@JiraTestKey("SCRUM-T5") 
 	public void testCreateManageServiceTypes() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
@@ -78,7 +78,7 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 	}
 
 	@Test(priority = 3)
-	@ZephyrCase("SCRUM-T6") 
+	@JiraTestKey("SCRUM-T6") 
 	public void testEditManageServiceTypes() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
@@ -98,7 +98,7 @@ public class ManageServiceTypesTest extends FrameworkLibrary {
 	}  
 	
 	@Test(priority = 4)
-	@ZephyrCase("SCRUM-T7") 
+	@JiraTestKey("SCRUM-T7") 
 	public void testDeleteManageServiceTypes() {
 		try {
 			SoftAssert softAssert = new SoftAssert();

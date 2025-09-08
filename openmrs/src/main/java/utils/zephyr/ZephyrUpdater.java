@@ -8,7 +8,7 @@ public interface ZephyrUpdater {
 	String createTestCycle(String cycleName) throws IOException;
 	void addTestCasesToCycle(String cycleKey, List<String> testCases) throws IOException;
 	void updateExecutions(String cycleKey, List<String> testCases) throws IOException;
-	void updateExecutionForTestcase(String cycleKey, String testCase, String status) throws IOException;
+	void updateExecutionForTestcase(String cycleKey, String testCase, String status, String comment) throws IOException;
     boolean testCaseExists(String testCaseKey);
 
 }

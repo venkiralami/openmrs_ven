@@ -11,7 +11,7 @@ import pages.HomePage;
 import pages.LoginPage;
 import pages.ManageServiceTypesPage;
 import utils.CustomRandomUtils;
-import utils.zephyr.ZephyrCase;
+import utils.zephyr.JiraTestKey;
 
 public class LoginTest extends FrameworkLibrary {
 
@@ -19,7 +19,7 @@ public class LoginTest extends FrameworkLibrary {
 	HashMap<String, String> actualHMap = null;
 
 	@Test(enabled = false, priority = 1)
-	@ZephyrCase("SCRUM-T1") 
+	@JiraTestKey("SCRUM-T1") 
 	public void testManageServiceTypes() {
 		try {
 			SoftAssert softAssert = new SoftAssert();
