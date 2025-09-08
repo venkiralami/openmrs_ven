@@ -7,12 +7,13 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import libs.FrameworkLibrary;
 import utils.zephyr.ConfigReader;
 import utils.zephyr.JiraTestKey;
 import utils.zephyr.ZephyrClientFactory;
 import utils.zephyr.ZephyrUpdater;
 
-public class UpdateTestResultToZephyr {
+public class UpdateTestResultToZephyr extends FrameworkLibrary {
 
 	private String testCycleKey = null;
 

@@ -25,6 +25,7 @@ import org.testng.annotations.Test;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import libs.FrameworkLibrary;
 import utils.xray.XRayUpdater;
 import utils.xray.XrayJiraAutomationHelper;
 import utils.zephyr.ConfigReader;
@@ -32,7 +33,7 @@ import utils.zephyr.JiraTestKey;
 import utils.zephyr.ZephyrClientFactory;
 import utils.zephyr.ZephyrUpdater;
 
-public class UpdateTestResultToXRay {
+public class UpdateTestResultToXRay extends FrameworkLibrary {
 
 	XRayUpdater xrayUpdater = new XRayUpdater();
 	private String testExecutionKey = null;
