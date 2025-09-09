@@ -46,4 +46,34 @@ public class ZephyrSquadUpdater implements ZephyrUpdater {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public String createBug(String projectKey, String summary) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void linkBugToTestCase(String testCaseKey, String bugKey) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String createBug(String testKey, String summary, String description) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void attachScreenshot(String issueKey, String filePath) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void linkBugToTest(String testKey, String bugKey, String linkTypeName) {
+		// TODO Auto-generated method stub
+		
+	}
 }

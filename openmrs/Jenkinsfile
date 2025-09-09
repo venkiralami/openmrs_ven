@@ -376,7 +376,7 @@ stage('Send Extent Report Summary Email') {
 
                 // Summary table
                 def summaryTable = """
-                    <h4>Post: TestNG Execution Summary :</h4>
+                    <h4>Post: TestNG Execution Summary : </h4>
                     <table border="1" cellpadding="5" cellspacing="0">
                         <tr><th>Total</th><th>Passed</th><th>Failed</th><th>Skipped</th><th>Ignored</th></tr>
                         <tr>
@@ -424,7 +424,7 @@ stage('Send Extent Report Summary Email') {
                 """
 
                 emailext(
-                    subject: "Post1: Test Execution Report - Build #${env.BUILD_NUMBER} :: ${currentBuild.currentResult}",
+                    subject: "Post1: Test Report - ${JOB_NAME} : #${BUILD_NUMBER} - Build #${env.BUILD_NUMBER} :: ${currentBuild.currentResult}",
                     body: emailBody,
                     to: "venki.ralami@gmail.com",
                     mimeType: 'text/html',

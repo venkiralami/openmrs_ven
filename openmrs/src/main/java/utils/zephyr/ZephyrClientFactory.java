@@ -9,7 +9,7 @@ public class ZephyrClientFactory {
             return new ZephyrScaleUpdater();
         }if ("XRAY".equals(type)) {
           //  return new XRayUpdater();
-        	 return new ZephyrSquadUpdater();
+        	 return new ZephyrScaleUpdater();
         }
         else {
             return new ZephyrSquadUpdater();
