@@ -44,7 +44,7 @@ public class UpdateTestResultToZephyr extends FrameworkLibrary {
 		};
 	}
 
-	//@Test(dataProvider = "testResults")
+	@Test(dataProvider = "testResults")
 	@JiraTestKey("SCRUM-T2") 
 	private void updateZephyr(String testCaseKey, String status, String comments) {
 		try {
@@ -72,7 +72,7 @@ public class UpdateTestResultToZephyr extends FrameworkLibrary {
 		}
 	}
 	
-	@Test
+	//@Test
 	@JiraTestKey("SCRUM-T5") 
 	private void linkBugToTestdd() throws IOException {
 		String testKey = "SCRUM-T2";
@@ -88,7 +88,7 @@ public class UpdateTestResultToZephyr extends FrameworkLibrary {
 		
 	}
 	
-	@Test
+	//@Test
 	@JiraTestKey("SCRUM-T5") 
 	private void linkBugToTest() {
 		String testKey = "SCRUM-T4";

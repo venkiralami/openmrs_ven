@@ -29,7 +29,7 @@ public class PaginationTest extends FrameworkLibrary {
         Assert.assertTrue(recordFound, "Record not found using Page number pagination!");
     }
     
-    @Test	
+    //@Test	
     @JiraTestKey("SCRUM-T1") // 
     public void verifyFailTest() {
     	

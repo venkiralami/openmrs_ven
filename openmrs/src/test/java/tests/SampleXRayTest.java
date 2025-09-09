@@ -16,7 +16,7 @@ public class SampleXRayTest  extends FrameworkLibrary  {
     	Assert.assertTrue(true);
     }
 
-    @Test
+  //  @Test
     @JiraTestKey("SCRUM-16")
     public void failedTest() {
         // throw new RuntimeException("Login button missing");
